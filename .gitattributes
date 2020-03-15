@@ -1,1 +1,1 @@
-*.razor linguist-detectable
+*.rb linguist-language=CSharp
