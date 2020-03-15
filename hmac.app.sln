@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "hmac.app", "src\app\hmac.app.csproj", "{B96164B9-37D6-439D-8206-9206F9B39E51}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "src\test\UnitTests\UnitTests.csproj", "{42B52920-946A-414B-B1D5-466737F24C5F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{B96164B9-37D6-439D-8206-9206F9B39E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B96164B9-37D6-439D-8206-9206F9B39E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B96164B9-37D6-439D-8206-9206F9B39E51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42B52920-946A-414B-B1D5-466737F24C5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42B52920-946A-414B-B1D5-466737F24C5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42B52920-946A-414B-B1D5-466737F24C5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42B52920-946A-414B-B1D5-466737F24C5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
