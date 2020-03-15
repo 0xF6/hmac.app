@@ -1,0 +1,7 @@
+Razor:
+  type: programming
+  color: "#660066"
+  extensions:
+  - ".razor"
+  tm_scope: text.html.cshtml
+  ace_mode: razor
