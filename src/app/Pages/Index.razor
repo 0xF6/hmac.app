@@ -1,5 +1,59 @@
 ﻿@page "/"
+@using System.Web
+@using hmac.Core
+@using Newtonsoft.Json.Linq
+@inject IJSRuntime js
+@inject ILogger<ComponentBase> logger
+@inject NavigationManager NavigationManager
+<div id="editor">
+    {
+    "j": true,
+    "a": 1,
+    "x": {}
+    }
+</div>
+<button class="ui right labeled icon button" @onclick="OnClick">
+    <i class="right arrow icon"></i>
+    Next
+</button>
+<div class="ui input">
+    <input id="signature" type="text" placeholder="Signature..." >
+</div>
+@code
+{
+    [Parameter]
+    public string Signature { get; set; }
+    private Config config = new Config();
+    private async ValueTask<string> getCode()
+    {
+        return await js.InvokeAsync<string>("editor.getValue");
+    }
 
-<h1>Hello, world!</h1>
+    private async ValueTask SetSignature(string sign)
+    {
+        logger.LogCritical(sign);
+        await js.InvokeVoidAsync("setValue", "#signature", sign);
+    }
+    public async Task OnClick()
+    {
+        var str = await getCode();
+        logger.LogCritical(str);
+        await SetSignature(await new HMACProcessor(js).WithSecret("123").WithOutput(OutputType.Hex).CreateHash(JToken.Parse(str)));
+    }
 
-Welcome to your new app.
+    #region Overrides of ComponentBase
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        await js.InvokeVoidAsync("domReady");
+        var uri = new UriBuilder(NavigationManager.Uri);
+        var query = HttpUtility.ParseQueryString(uri.Query);
+        if (query["c"] != null)
+            config = ConfigMapper.FromString(query.Get("c"));
+    }
+
+    #endregion
+
+}
