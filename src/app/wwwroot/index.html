@@ -3,22 +3,56 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>asd</title>
+    <title>HMAC Tools set</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+
+    <meta name="robots" content="all" />
+    <meta name="keywords" content="hmac, hmac online, json, json sign, signer, online" />
+    <meta name="author" content="Yuuki Wesp" />
+    <meta name="copyright" content="Yuuki Wesp" />
+    <meta name="yandex" content="noyaca" />
+    <meta name="Description"
+          content="HMAC.app a online tool set for sign\validate json or etc" />
+
+    <link rel="icon" type="image/png" href="/icon.png" />
+
     <base href="/" />
-    <link href="/css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.4/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.4/dist/semantic.min.js"></script>
+
     <link href="/css/site.css" rel="stylesheet" />
 </head>
 
 <body>
-    <app>Loading...</app>
-
+    <app>
+        <div class="ui active slow green double loader"></div>
+    </app>
     <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
+        <div class="ui segment">
+            <em data-emoji=":boom:" class="loading"></em>
+            An unhandled error has occurred.
+            <a href="" class="reload">Reload</a>
+        </div>
     </div>
-    <script src="/_framework/blazor.webassembly.js"></script>
+    <!--<script src="/_framework/blazor.webassembly.js"></script>-->
+    <script src="https://www.gstatic.com/firebasejs/7.11.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.11.0/firebase-analytics.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyDl2Wk8ORA4-JPgezcJGb1hwd3r_XIxETs",
+            authDomain: "hmac-app.firebaseapp.com",
+            databaseURL: "https://hmac-app.firebaseio.com",
+            projectId: "hmac-app",
+            storageBucket: "hmac-app.appspot.com",
+            messagingSenderId: "401378087964",
+            appId: "1:401378087964:web:f241e78e4be42a8bc63bd9",
+            measurementId: "G-VL8CCZJF6R"
+        };
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+    </script>
 </body>
 
 </html>
