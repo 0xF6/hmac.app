@@ -1,0 +1,15 @@
+{
+  "name": "hmac.app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/0xF6/hmac.app.git",
+  "author": "Yuuki Wesp <ivysola@0xf6.moe>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "dotnet-sdk-3.0-linux-x64": "^3.0.1007"
+  },
+  "scripts": {
+    "build": "dotnet publish"
+  }
+}
