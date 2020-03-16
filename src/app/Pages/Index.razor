@@ -5,40 +5,103 @@
 @inject IJSRuntime js
 @inject ILogger<ComponentBase> logger
 @inject NavigationManager NavigationManager
-<div id="editor">
-    {
+
+<div class="ui segment">
+    <div class="ui input @(SecretIsError ? "error" : "")">
+        <input id="secret" type="password" placeholder="Secret..." @bind-value="Secret" >
+    </div>
+    <br />
+    <br />
+    <div id="editor">
+{
     "j": true,
     "a": 1,
     "x": {}
-    }
+}
+    </div>
+    <button class="ui right labeled icon button" @onclick="OnClick">
+        <i class="right arrow icon"></i>
+        Next
+    </button>
+    <div class="ui action input">
+        <input id="signature" type="text" placeholder="Signature..." @bind-value="Signature">
+        <button class="ui compact icon button clipboard-copy">
+            <i class="copy icon"></i>
+        </button>
+    </div>
 </div>
-<button class="ui right labeled icon button" @onclick="OnClick">
-    <i class="right arrow icon"></i>
-    Next
-</button>
-<div class="ui input">
-    <input id="signature" type="text" placeholder="Signature..." >
+
+
+<div class="ui segment">
+    <div class="ui selection dropdown">
+        <input type="hidden" name="AdapterType" @bind-value="config.Adapter">
+        <i class="dropdown icon"></i>
+        <div class="default text">AdapterType</div>
+        <div class="menu">
+            <div class="item" data-value="SHA512">SHA512</div>
+            <div class="item" data-value="SHA384">SHA384</div>
+            <div class="item" data-value="SHA256">SHA256</div>
+            <div class="item" data-value="SHA1">SHA1</div>
+        </div>
+    </div>
+    <div class="ui selection dropdown">
+        <input type="hidden" name="OutputType" @bind-value="config.OutputType">
+        <i class="dropdown icon"></i>
+        <div class="default text">OutputType</div>
+        <div class="menu">
+            <div class="item" data-value="Base64">BASE64</div>
+            <div class="item" data-value="Hex">HEX</div>
+        </div>
+    </div>
 </div>
+
 @code
 {
     [Parameter]
+    public string Secret
+    {
+        get => _secret;
+        set
+        {
+            ValidateSecret();
+            this._secret = value;
+        }
+    }
+    [Parameter]
     public string Signature { get; set; }
+
+
+    private string _secret;
+
+    public bool SecretIsError { get; set; }
+
     private Config config = new Config();
     private async ValueTask<string> getCode()
     {
         return await js.InvokeAsync<string>("editor.getValue");
     }
+    private void ValidateSecret() => SecretIsError = string.IsNullOrEmpty(Secret);
 
-    private async ValueTask SetSignature(string sign)
+    private void SetSignature(string sign)
     {
-        logger.LogCritical(sign);
-        await js.InvokeVoidAsync("setValue", "#signature", sign);
+        Signature = sign;
     }
     public async Task OnClick()
     {
+        if(string.IsNullOrEmpty(this.Secret))
+        {
+            this.SecretIsError = true;
+            return;
+        }
+        this.SecretIsError = false;
+
         var str = await getCode();
         logger.LogCritical(str);
-        await SetSignature(await new HMACProcessor(js).WithSecret("123").WithOutput(OutputType.Hex).CreateHash(JToken.Parse(str)));
+        SetSignature(await new HMACProcessor(js)
+            .WithSecret(Secret)
+            .WithAdapter(config.Adapter)
+            .WithOutput(config.OutputType)
+            .CreateHash(JToken.Parse(str)));
     }
 
     #region Overrides of ComponentBase
