@@ -4,6 +4,7 @@
 @using Newtonsoft.Json.Linq
 @inject IJSRuntime js
 @inject ILogger<ComponentBase> logger
+@inject HMACProcessor hmac
 @inject NavigationManager NavigationManager
 
 <div class="ui segment">
@@ -31,7 +32,11 @@
     </div>
 </div>
 
-
+<div class="ui segment">
+    <div class="ui input fluid">
+        <input id="signature" type="text" placeholder="Template string for sign" @bind-value="SignString">
+    </div>
+</div>
 <div class="ui segment">
     <div class="ui selection dropdown">
         <input type="hidden" name="AdapterType" @bind-value="config.Adapter">
@@ -70,6 +75,7 @@
     [Parameter]
     public string Signature { get; set; }
 
+    public string SignString { get; set; }
 
     private string _secret;
 
@@ -97,7 +103,7 @@
 
         var str = await getCode();
         logger.LogCritical(str);
-        SetSignature(await new HMACProcessor(js)
+        SetSignature(await hmac
             .WithSecret(Secret)
             .WithAdapter(config.Adapter)
             .WithOutput(config.OutputType)
@@ -109,6 +115,7 @@
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        hmac.OnSignConstruct += (x) => { SignString = x; };
         await base.OnAfterRenderAsync(firstRender);
         await js.InvokeVoidAsync("domReady");
         var uri = new UriBuilder(NavigationManager.Uri);

@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using Microsoft.JSInterop;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -19,7 +20,11 @@
         private JsonSerializerSettings serializerSettings { get; set; }
             = new JsonSerializerSettings();
 
-        public HMACProcessor(IJSRuntime js) => _js = js;
+        public HMACProcessor(IJSRuntime js, ILogger<HMACProcessor> logger)
+        {
+            _js = js;
+            _logger = logger;
+        }
 
         private bool skipEmptyFields { get; set; }
 
@@ -74,12 +79,17 @@
         {
             if (string.IsNullOrEmpty(_secret))
                 throw new ArgumentException($"secret is null, use {nameof(WithSecret)} to set secret.");
-           // _logger.LogInformation($"Create hash by {typeof(T).FullName}");
+            _logger.LogInformation($"Create hash by {typeof(T).FullName}");
             var signString = CreateSignString(body);
             var hash = this._computeHash(signString, _secret);
-           // _logger.LogInformation($"Created hash with string '{signString}', result: '{hash}'");
+           _logger.LogInformation($"Created hash with string '{signString}', result: '{hash}'");
+            OnSignConstruct?.Invoke(signString);
             return hash;
         }
+
+        public delegate void SignStringConstruct(string hashString);
+
+        public event SignStringConstruct OnSignConstruct;
 
         private async Task<string> _computeHash(string text, string secretKey)
         {
@@ -94,6 +104,11 @@
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        // standard format 'zzz' has place 00:00, but need 0000
+        // iso8601
+        private string FormatDate { get; set; } = "yyyy-MM-ddTHH:mm:ss+0000";
+        private ILogger<HMACProcessor> _logger { get; }
 
         private string ToSignString(string body)
         {
@@ -111,9 +126,9 @@
 
                 if (x.Value is DateTime d2)
                 {
-                    var iso8601 = "yyyy-MM-ddTHH:mm:ss+0000"; // standard format 'zzz' has place 00:00, but need 0000
+                    var format = "yyyy-MM-ddTHH:mm:ss+0000"; 
                     var dd = d2.ToUniversalTime();
-                    return $"{x.Key}:{dd.ToString(iso8601)};";
+                    return $"{x.Key}:{dd.ToString(format)};";
                 }
 
                 if (x.Value is bool b)
