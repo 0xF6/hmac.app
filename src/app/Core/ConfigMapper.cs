@@ -2,8 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using Microsoft.JSInterop;
@@ -130,10 +132,9 @@
                     var dd = d2.ToUniversalTime();
                     return $"{x.Key}:{dd.ToString(format)};";
                 }
-
                 if (x.Value is bool b)
                     return $"{x.Key}:{(b ? "1" : "0")};";
-                return $"{x.Key}:{x.Value};";
+                return $"{x.Key}:{Convert.ToString(x.Value, CultureInfo.InvariantCulture)};";
             }
 
             // skip signature key
@@ -143,7 +144,7 @@
             if (skipEmptyFields)
                 flatten = flatten.Where(x => x.Value != null)
                     .Where(x => !string.IsNullOrEmpty($"{x.Value}"));
-
+            
             // ordering and return
             return string.Join("", flatten.OrderBy(x => x.Key).ToArray().Select(Selector)).TrimEnd(';');
         }
