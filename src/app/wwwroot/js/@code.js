@@ -36,3 +36,11 @@ function castHMAC(adapter, text, secret) {
         return CryptoJS.HmacSHA1(text, secret).toString();
     throw new Error("not valid adapter id: " + adapter);
 }
+function __toast(obj) {
+    $('body').toast(obj);
+}
+function addNewKey() {
+    $('#addKeyForm').modal({
+        blurring: true
+    }).modal('show');
+}
