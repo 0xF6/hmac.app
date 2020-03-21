@@ -1,4 +1,51 @@
 ﻿@inherits LayoutComponentBase
+<div class="ui container" style="padding-top: 50px;">
+    <h2 class="ui center aligned header">
+        HMAC Tool set
+        <div class="sub header">Create signature of JSON and other strings</div>
+    </h2>
+</div>
 <div id="page" class="ui container">
     @Body
 </div>
+<footer class="ui vertical footer segment">
+    <div class="ui container">
+        <div class="ui stackable grid">
+            <div class="three wide column">
+                <h4 class="ui header">Community</h4>
+                <div class="ui link list">
+                    <a class="item" href="https://github.com/0xF6/hmac.app/issues/new/choose" target="_blank">
+                        <i class="edit icon"></i>
+                        Submit an Issue
+                    </a>
+                    <a class="item" href="https://github.com/0xF6/hmac.app" target="_blank">
+                        <i class="github icon"></i>
+                        GitHub Repository
+                    </a>
+                </div>
+            </div>
+            <div class="three wide column">
+                <h4 class="ui header">Social</h4>
+                <div class="ui link list">
+                    <a class="item" href="https://t.me/ivysola" target="_blank">
+                        <i class="telegram icon"></i>
+                        Contact with me
+                    </a>
+                    <a class="item" href="https://0xf6.moe" target="_blank">
+                        <i class="accessible icon"></i>
+                        0xF6.moe
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="ui section divider"></div>
+        <div class="ui horizontal small divided link list">
+            <a class="item" href="https://github.com/0xF6/hmac.app/blob/master/LICENSE.md" target="_blank">
+                Free &amp; Open Source (MIT)
+            </a>
+            <a class="item">
+                @DateTime.UtcNow.Year &copy; Yuuki Wesp
+            </a>
+        </div>
+    </div>
+</footer>
