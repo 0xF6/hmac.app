@@ -6,38 +6,41 @@
 @inject ILogger<ComponentBase> logger
 @inject HMACProcessor hmac
 @inject NavigationManager NavigationManager
-
+@inject IToastController toast
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 <div class="ui segment">
     <div class="ui input @(SecretIsError ? "error" : "")">
-        <input id="secret" type="password" placeholder="Secret..." @bind-value="Secret" >
+        <input id="secret" type="password" placeholder="Secret..." @bind-value="Secret">
     </div>
     <br />
     <br />
-    <div id="editor">
-{
+    <div id="editor">{
     "j": true,
     "a": 1,
     "x": {}
-}
-    </div>
+}</div>
     <button class="ui right labeled icon button" @onclick="OnClick">
         <i class="right arrow icon"></i>
-        Next
+        Generate
     </button>
     <div class="ui action input">
-        <input id="signature" type="text" placeholder="Signature..." @bind-value="Signature">
+        <input type="text" placeholder="Signature..." @bind-value="Signature">
         <button class="ui compact icon button clipboard-copy">
             <i class="copy icon"></i>
         </button>
     </div>
 </div>
+@if (ProcessingType == "JSON")
+{
+    <div class="ui segment">
+        <div class="ui input fluid">
+            <input type="text" placeholder="Template string for sign" @bind-value="SignString">
+        </div>
+    </div>
+}
 
 <div class="ui segment">
-    <div class="ui input fluid">
-        <input id="signature" type="text" placeholder="Template string for sign" @bind-value="SignString">
-    </div>
-</div>
-<div class="ui segment">
+    From 
     <div class="ui selection dropdown">
         <input type="hidden" name="AdapterType" @bind-value="config.Adapter">
         <i class="dropdown icon"></i>
@@ -49,6 +52,7 @@
             <div class="item" data-value="SHA1">SHA1</div>
         </div>
     </div>
+    to
     <div class="ui selection dropdown">
         <input type="hidden" name="OutputType" @bind-value="config.OutputType">
         <i class="dropdown icon"></i>
@@ -58,10 +62,41 @@
             <div class="item" data-value="Hex">HEX</div>
         </div>
     </div>
+    with
+    <div class="ui selection dropdown">
+        <input type="hidden" name="ProcessingType" @bind-value="ProcessingType">
+        <i class="dropdown icon"></i>
+        <div class="default text">ProcessingType</div>
+        <div class="menu">
+            <div class="item" data-value="JSON">JSON2String</div>
+            <div class="item" data-value="RAW">RAW</div>
+        </div>
+    </div>
+</div>
+
+
+<div class="ui modal" id="addKeyForm">
+    <i class="close icon"></i>
+    <div class="header">
+        Add new key
+    </div>
+    <div class="image content">
+        <div class="image">
+            An image can appear on left or an icon
+        </div>
+        <div class="description">
+            A description can appear on the right
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui button">Cancel</div>
+        <div class="ui button">Save</div>
+    </div>
 </div>
 
 @code
 {
+    private List<string> Keys { get; set; }
     [Parameter]
     public string Secret
     {
@@ -81,6 +116,8 @@
 
     public bool SecretIsError { get; set; }
 
+    public string ProcessingType { get; set; } = "JSON";
+
     private Config config = new Config();
     private async ValueTask<string> getCode()
     {
@@ -88,13 +125,9 @@
     }
     private void ValidateSecret() => SecretIsError = string.IsNullOrEmpty(Secret);
 
-    private void SetSignature(string sign)
-    {
-        Signature = sign;
-    }
     public async Task OnClick()
     {
-        if(string.IsNullOrEmpty(this.Secret))
+        if (string.IsNullOrEmpty(this.Secret))
         {
             this.SecretIsError = true;
             return;
@@ -103,11 +136,28 @@
 
         var str = await getCode();
         logger.LogCritical(str);
-        SetSignature(await hmac
+        var processor = hmac
             .WithSecret(Secret)
             .WithAdapter(config.Adapter)
-            .WithOutput(config.OutputType)
-            .CreateHash(JToken.Parse(str)));
+            .WithOutput(config.OutputType);
+
+        if(ProcessingType == "JSON")
+            Signature = await processor.CreateHash(JToken.Parse(str));
+        else if(ProcessingType == "RAW")
+            Signature = await processor.CreateSignForRaw(str);
+        await toast.Open()
+            .WithMessage("Success create sign")
+            .WithType(ToastType.Success)
+            .WithDuration(TimeSpan.FromSeconds(1))
+            .InvokeAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(await localStorage.ContainKeyAsync("secret:keys"))
+            this.Keys = await localStorage.GetItemAsync<List<string>>("secret:keys");
+        else
+            this.Keys = new List<string>();
     }
 
     #region Overrides of ComponentBase
