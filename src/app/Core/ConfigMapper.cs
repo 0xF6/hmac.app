@@ -12,7 +12,7 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    internal class HMACProcessor
+    public class HMACProcessor
     {
         private readonly IJSRuntime _js;
         private string _secret;
